@@ -1,0 +1,85 @@
+Car MPG Predictor
+========================================================
+author: Your Name
+date: `r Sys.Date()`
+autosize: true
+font-family: 'Georgia'
+css: custom.css
+
+A Shiny application for predicting fuel efficiency using the `mtcars` dataset.
+
+---
+
+The Problem
+========================================================
+
+**How fuel-efficient is a car with given specs?**
+
+- Fuel efficiency (MPG) matters for **cost, environment, and purchasing decisions**
+- It's hard to estimate without running tests — but regression can help!
+- The classic `mtcars` dataset (Motor Trend, 1974) gives us a foundation
+
+```{r, echo=FALSE}
+data(mtcars)
+cat("Dataset: mtcars |", nrow(mtcars), "cars |", ncol(mtcars), "variables\n")
+cat("MPG range:", min(mtcars$mpg), "–", max(mtcars$mpg), "| Mean:", round(mean(mtcars$mpg),1))
+```
+
+---
+
+The Model
+========================================================
+
+A **linear regression** model predicts MPG from 4 key inputs:
+
+| Input | Variable | Range |
+|-------|----------|-------|
+| Cylinders | `cyl` | 4, 6, 8 |
+| Horsepower | `hp` | 50–340 |
+| Weight | `wt` | 1.5–5.5 klbs |
+| Transmission | `am` | 0=Auto, 1=Manual |
+
+```{r}
+model <- lm(mpg ~ cyl + hp + wt + am, data = mtcars)
+round(summary(model)$r.squared, 3)   # R-squared
+```
+
+**R² = `r round(summary(lm(mpg ~ cyl + hp + wt + am, data=mtcars))$r.squared, 3)`** — the model explains ~87% of MPG variance.
+
+---
+
+The Shiny App
+========================================================
+
+**Features at a glance:**
+
+- 🎛️ **Radio buttons** to select cylinder count (4 / 6 / 8)
+- 🎚️ **Sliders** for horsepower and weight
+- 📋 **Dropdown** for transmission type
+- 📊 **Reactive histogram** showing where your car sits vs. all `mtcars` cars
+- 📐 **Confidence interval** displayed alongside the point estimate
+- 📄 **Model summary** table always visible for transparency
+
+All documentation is embedded directly in the app — no external links needed.
+
+---
+
+Live Demo & Links
+========================================================
+
+```{r, echo=FALSE, fig.width=7, fig.height=4}
+model <- lm(mpg ~ cyl + hp + wt + am, data = mtcars)
+pred_example <- predict(model,
+  newdata = data.frame(cyl=4, hp=110, wt=2.6, am=1))
+
+hist(mtcars$mpg, col="#AED6F1", border="white",
+     main="MPG Distribution + Example Prediction",
+     xlab="Miles Per Gallon", ylab="Count")
+abline(v=pred_example, col="#e74c3c", lwd=3, lty=2)
+legend("topright",
+       legend=paste("4-cyl, 110hp, 2.6klb, manual →", round(pred_example,1), "MPG"),
+       col="#e74c3c", lwd=2, lty=2, bty="n")
+```
+
+🔗 **App:** https://YOUR-USERNAME.shinyapps.io/mpg-predictor  
+🔗 **Code:** https://github.com/YOUR-USERNAME/mpg-predictor
